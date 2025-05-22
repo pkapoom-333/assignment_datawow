@@ -23,4 +23,20 @@ model Reservation {
   concert   Concert  @relation(fields: [concertId], references: [id])
   concertId String
   createdAt DateTime @default(now())
+  canceledAt  DateTime?
+  status      ReservationStatus @default(CONFIRMED)
+}
+
+enum ReservationStatus {
+  PENDING   // กำลังจอง
+  CONFIRMED // จองสำเร็จ
+  CANCELED  // ยกเลิก
+}
+
+model UserActionLog {
+  id         String   @id @default(uuid())
+  userId     String
+  action     String  
+  details    String?  
+  createdAt  DateTime @default(now())
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Query } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
 import { ReserveSeatDto } from './dto/reserve-seat.dto';
 import { UserHistoryDto } from './dto/user-history.dto';
@@ -12,13 +12,13 @@ export class ReservationController {
     return this.reservationService.reserve(body.userId, body.concertId);
   }
 
-  @Delete()
+  @Put()
   cancel(@Body() body: ReserveSeatDto) {
     return this.reservationService.cancel(body.userId, body.concertId);
   }
 
-  @Get()
-  history(@Body() body: UserHistoryDto) {
-    return this.reservationService.history(body.userId);
+  @Get('user-actions')
+  history(@Query('userId') userId: string) {
+    return this.reservationService.history(userId);
   }
 }

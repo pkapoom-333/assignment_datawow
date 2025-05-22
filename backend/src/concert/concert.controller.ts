@@ -16,6 +16,11 @@ export class ConcertController {
     return this.concertService.findAll();
   }
 
+  @Get('concert-stats')
+  getStats() {
+    return this.concertService.getConcertStats();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.concertService.findOne(id);
