@@ -12,10 +12,15 @@ describe('ReservationService', () => {
       delete: jest.fn(),
       findMany: jest.fn(),
       findFirst: jest.fn(),
+      update: jest.fn(),
     },
     concert: {
       update: jest.fn(),
       findUnique: jest.fn(),
+    },
+    userActionLog: {
+      create: jest.fn(),
+      findMany: jest.fn(),
     },
     $transaction: jest.fn((actions) => Promise.all(actions)),
   };
@@ -102,13 +107,12 @@ describe('ReservationService', () => {
 
     mockPrismaService.reservation.findFirst.mockResolvedValue(mockReservation);
     mockPrismaService.reservation.delete.mockResolvedValue(mockReservation);
-    mockPrismaService.concert.update.mockResolvedValue({});
+    mockPrismaService.reservation.update.mockResolvedValue(mockReservation);
 
-    // ✅ แก้ตรงนี้: จำลองเรียก operations จริง
     mockPrismaService.$transaction.mockImplementation(async (operations) => {
       const results = [];
       for (const op of operations) {
-        results.push(await op); // ✅ สำคัญตรงนี้
+        results.push(await op);
       }
       return results;
     });
@@ -119,24 +123,46 @@ describe('ReservationService', () => {
     );
 
     expect(result).toEqual(mockReservation);
-    expect(mockPrismaService.reservation.delete).toHaveBeenCalledWith({
+    expect(mockPrismaService.reservation.update).toHaveBeenCalledWith({
       where: { id: mockReservation.id },
+      data: {
+        status: 'CANCELED',
+        canceledAt: expect.any(Date),
+      },
     });
   });
 
   it('should return reservation history', async () => {
     const userId = 'user1';
     const mockResult = [
-      { id: 'res1', userId, concertId: 'concert1' },
-      { id: 'res2', userId, concertId: 'concert2' },
+      {
+        id: 'log1',
+        userId,
+        action: 'Reserve concert',
+        details: 'Concert: Test Concert',
+      },
+      {
+        id: 'log2',
+        userId,
+        action: 'Cancel reservation',
+        details: 'Concert: Test Concert',
+      },
     ];
 
-    mockPrismaService.reservation.findMany.mockResolvedValue(mockResult);
+    mockPrismaService.userActionLog.findMany.mockResolvedValue(mockResult);
 
     const result = await service.history(userId);
     expect(result).toEqual(mockResult);
-    expect(mockPrismaService.reservation.findMany).toHaveBeenCalledWith({
+    expect(mockPrismaService.userActionLog.findMany).toHaveBeenCalledWith({
       where: { userId },
     });
+  });
+
+  it('should throw if reservation not found or already canceled', async () => {
+    mockPrismaService.reservation.findFirst.mockResolvedValue(null);
+
+    await expect(service.cancel('user1', 'concert1')).rejects.toThrow(
+      'Reservation not found or already canceled',
+    );
   });
 });

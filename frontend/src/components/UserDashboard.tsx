@@ -39,7 +39,6 @@ export const UserDashboard = () => {
   const fetchData = async () => {
     try {
       const concertList = await ConcertService.getConcerts();
-      console.log("concertList", concertList);
       setConcerts(concertList);
     } catch (error) {
       alert("Failed to load concerts.");

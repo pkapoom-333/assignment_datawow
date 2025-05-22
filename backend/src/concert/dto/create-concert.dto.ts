@@ -15,7 +15,7 @@ export class CreateConcertDto {
   @Min(1)
   totalSeats!: number;
 
-  @ApiProperty({ example: 100 }) // ✅ เพิ่ม Swagger metadata
+  @ApiProperty({ example: 100 })
   @IsInt()
   @Min(0)
   availableSeats!: number;
