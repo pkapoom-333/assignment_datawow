@@ -1,5 +1,5 @@
 import { CssBaseline } from "@mui/material";
-import Navigation from "../components/Navigation";
+import ClientLayout from "@/components/ClientLayout";
 
 export default function RootLayout({
   children,
@@ -10,7 +10,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <CssBaseline />
-        <Navigation>{children}</Navigation>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );
