@@ -47,23 +47,23 @@ describe('ReservationService', () => {
     const dto = { userId: 'user1', concertId: 'concert1' };
     const mockResult = { id: 'res1', ...dto };
 
-    // ✅ Mock reservation ยังไม่เคยมี
+    // Mock reservation ยังไม่เคยมี
     mockPrismaService.reservation.findFirst.mockResolvedValue(null);
 
-    // ✅ Mock concert มีที่นั่งพอ
+    // Mock concert มีที่นั่งพอ
     mockPrismaService.concert.findUnique.mockResolvedValue({
       id: dto.concertId,
       name: 'Test Concert',
       availableSeats: 10,
     });
 
-    // ✅ Mock concert.update (ไม่ต้องสนใจผลลัพธ์ใน test นี้)
+    //  Mock concert.update (ไม่ต้องสนใจผลลัพธ์ใน test นี้)
     mockPrismaService.concert.update.mockResolvedValue({});
 
-    // ✅ Mock reservation.create return mockResult
+    // Mock reservation.create return mockResult
     mockPrismaService.reservation.create.mockResolvedValue(mockResult);
 
-    // ✅ Mock $transaction ให้คืนค่าทั้งสองฟังก์ชัน
+    // Mock $transaction ให้คืนค่าทั้งสองฟังก์ชัน
     mockPrismaService.$transaction.mockImplementation(async (actions) => {
       const results = await Promise.all(actions);
       return results;
@@ -72,7 +72,7 @@ describe('ReservationService', () => {
     // 🔍 Execute
     const result = await service.reserve(dto.userId, dto.concertId);
 
-    // ✅ ตรวจผล
+    // ตรวจผล
     expect(result).toEqual(mockResult);
 
     expect(mockPrismaService.reservation.create).toHaveBeenCalledWith({
